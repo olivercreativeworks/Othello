@@ -4,7 +4,7 @@ Attach the script to your google sheet, or just make a copy via this link:
 
 [Make a copy](https:docs.google.com/spreadsheets/d/1h9ADZSWxwvf_JxjvsctTlarKNEdTQVn5b5jOtsvZZsg/copy)
 
-# Rules: 
+# Rules 
 There are few variations of Othello. This script is based on the rules found here: [Mattel Othello Instructions](https:service.mattel.com/instruction_sheets/T8130-Eng.pdf)
 
 ## Objective
