@@ -20,3 +20,19 @@ function makeMove(gameboard, yourMove){
     return areEqual(boardToEvaluate, evaluatedBoard) ? gameboard : evaluatedBoard
   }
 }
+
+/**
+ * @param {Gameboard} grid
+ * @param {...YourMove} moves
+ */
+function placeDisks(grid, ...moves){
+  return moves.reduce((board, move) => board.with(move.row, board.at(move.row).with(move.column, move.diskColor)), grid)
+}
+
+/**
+ * @typedef {Object} YourMove
+ * @property {number} row
+ * @property {number} column
+ * @property {Disk} diskColor 
+ */
+
