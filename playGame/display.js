@@ -101,6 +101,7 @@ function setupDisplay(game){
     const gameHistory = getBoardHistory()
     
     const previousMove = gameHistory.getPreviousBoardState()
+    console.log(gameHistory.getFullHistory())
     if(!previousMove || gameHistory.getFullHistory().length <= 1){ 
       game.getRange(CONSTANTS.gameOptions).clearContent()
       SpreadsheetApp.getActiveSpreadsheet().toast("There is nothing to undo.", "Cannot undo", 3)
@@ -166,13 +167,22 @@ function setupDisplay(game){
 function getBoardHistory(){
   const storage = PropertiesService.getDocumentProperties()
   return {
-    getFullHistory: () => Maybe.of(storage.getProperty(CONSTANTS.boardHistory)).map(x => JSON.parse(x)).orElse([]),
+    getFullHistory: () => {
+      const history = Maybe.of(storage.getProperty(CONSTANTS.boardHistory)).orElseGet(initializeBoardHistory)
+      return JSON.parse(history)
+    },
     getPreviousBoardState: /** @return {Gameboard} */ () => getBoardHistory().getFullHistory()[0],
     clear: () => { storage.deleteProperty(CONSTANTS.boardHistory) },
     update: /** @param {Gameboard} gameboard */ (gameboard) => {
       if(areEqual(gameboard, getBoardHistory().getPreviousBoardState())) { return }
       storage.setProperty(CONSTANTS.boardHistory, JSON.stringify([gameboard, ...getBoardHistory().getFullHistory()]))
     }
+  }
+
+  function initializeBoardHistory(){
+    return storage
+      .setProperty(CONSTANTS.boardHistory, JSON.stringify([createGameboard()]))
+      .getProperty(CONSTANTS.boardHistory)
   }
 }
 
@@ -195,5 +205,9 @@ class Maybe{
 
   orElse(value){
     return this.isNothing() ? value : this.x
+  }
+
+  orElseGet(fn){
+    return this.isNothing() ? fn() : this.x
   }
 }
