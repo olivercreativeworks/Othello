@@ -99,3 +99,25 @@ function getBoardHistory(){
     }
   }
 }
+
+class Maybe{
+  constructor(x){
+    this.x = x
+  }
+
+  static of(x){
+    return new Maybe(x)
+  }
+
+  map(fn){
+    return this.isNothing() ? Maybe.of(this.x) : Maybe.of(fn(this.x))
+  }
+
+  isNothing(){
+    return this.x === undefined || this.x === null
+  }
+
+  orElse(value){
+    return this.isNothing() ? value : this.x
+  }
+}
