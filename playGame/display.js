@@ -2,6 +2,7 @@ const CONSTANTS = {
   boardHistory: 'history',
   gameOptions: 'options',
   newGame: 'new game',
+  undo: 'undo',
   mostRecentMove: 'mostRecentMove',
   board: 'board',
 }
@@ -36,6 +37,7 @@ function setupDisplay(game){
   function playTurn(history){
     return (yourMove, makeYourMove) => {
       if(playerWantsToStartNewGame(yourMove.diskColor)) { return startNewGame(game) }
+      if(playerWantsToUndoMove(yourMove.diskColor)){ return undoMove(game) }
       const board = history.getPreviousBoardState()
       const updatedBoard = makeYourMove(board, yourMove)
       history.update(updatedBoard)
@@ -51,6 +53,12 @@ function setupDisplay(game){
    */
   function playerWantsToStartNewGame(playerInput){
     return playerInput?.toLowerCase() === CONSTANTS.newGame
+  }
+  /**
+   * @param {string} playerInput
+   */
+  function playerWantsToUndoMove(playerInput){
+    return playerInput?.toLowerCase() === CONSTANTS.undo
   }
 
   /**
@@ -91,7 +99,7 @@ function getBoardHistory(){
   const storage = PropertiesService.getDocumentProperties()
   return {
     getFullHistory: () => Maybe.of(storage.getProperty(CONSTANTS.boardHistory)).map(x => JSON.parse(x)).orElse([]),
-    getPreviousBoardState: () => getBoardHistory().getFullHistory()[0],
+    getPreviousBoardState: /** @return {Gameboard} */ () => getBoardHistory().getFullHistory()[0],
     clear: () => { storage.deleteProperty(CONSTANTS.boardHistory) },
     update: /** @param {Gameboard} gameboard */ (gameboard) => {
       if(areEqual(gameboard, getBoardHistory().getPreviousBoardState())) { return }
