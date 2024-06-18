@@ -37,7 +37,7 @@ function setupDisplay(game){
   function playTurn(history){
     return (yourMove, makeYourMove) => {
       if(playerWantsToStartNewGame(yourMove.diskColor)) { return startNewGame(game) }
-      if(playerWantsToUndoMove(yourMove.diskColor)){ return undoMove(game) }
+      if(playerWantsToUndoMove(yourMove.diskColor)){ return undoMove(game, yourMove) }
       const board = history.getPreviousBoardState()
       const updatedBoard = makeYourMove(board, yourMove)
       history.update(updatedBoard)
@@ -64,7 +64,7 @@ function setupDisplay(game){
   /**
    * @param {SpreadsheetApp.Sheet} game
    * @param {string[][]} board
-   * @param {YourMove} yourMove
+   * @param {YourMove} [yourMove]
    */
   function updateGameDisplay(game, board, yourMove){
     const [boardRange, mostRecentMoveRange] = game.getRangeList([CONSTANTS.board, CONSTANTS.mostRecentMove])
@@ -92,6 +92,27 @@ function setupDisplay(game){
     displayOthelloGameboard(game, gameboard)
 
     gameHistory.update(gameboard)
+  }
+
+  /**
+   * @param {SpreadsheetApp.Sheet} game
+   */
+  function undoMove(game, yourMove) {
+    const gameHistory = getBoardHistory()
+    
+    const previousMove = gameHistory.getPreviousBoardState()
+    if(!previousMove || gameHistory.getFullHistory().length <= 1){ 
+      game.getRange(CONSTANTS.gameOptions).clearContent()
+      SpreadsheetApp.getActiveSpreadsheet().toast("There is nothing to undo.", "Cannot undo", 3)
+      return 
+    }
+
+    /** @type {Gameboard[]} */
+    const fullHistory = gameHistory.getFullHistory()
+    gameHistory.clear()
+    fullHistory.slice(1).toReversed().forEach(board => gameHistory.update(board))
+    updateGameDisplay(game, gameHistory.getPreviousBoardState(), yourMove)
+    game.getRange(CONSTANTS.gameOptions).clearContent()
   }
 
   /**
