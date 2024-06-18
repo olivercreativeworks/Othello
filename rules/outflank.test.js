@@ -14,6 +14,26 @@ function testingOutflank(outflank, numTests = 100) {
     })
   })
 
+  /**
+   * @return {TestResult}
+   */
+  function boardSizeIsPreserved(outflank, testBoard, bounds){
+    const description = "Resulting board should be the same size as the original"
+    const resultBoard = outflank(testBoard, bounds.leftBound)
+    return {
+      condition: sameNumberOfRows(resultBoard, testBoard) && sameNumberOfColumns(resultBoard, testBoard),
+      description,
+      message: {testBoard, bounds, resultBoard}
+    }
+
+    function sameNumberOfRows (resultBoard, testBoard){
+      return resultBoard.length === testBoard.length
+    }
+    function sameNumberOfColumns(resultBoard, testBoard){
+      return resultBoard.every((row, rowIndex) => row.length === testBoard.at(rowIndex).length)
+    }
+  }
+
   function handlesHorizontalOutflank(outflank){
     const gameboard = createTestGameboard()
     const bounds = getRandomHorizontalBounds(gameboard)
