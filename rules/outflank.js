@@ -2,6 +2,12 @@ function runTestingOutflank(){
   testingOutflank(outflank)
 }
 
+/**
+ * @typedef {Object} Coordinate
+ * @prop {number} row
+ * @prop {number} column
+ */
+
 function outflank(inputGameboard, yourMove){
   return placeDisks(inputGameboard, ...findOutflankedDisks(inputGameboard, yourMove))
 
